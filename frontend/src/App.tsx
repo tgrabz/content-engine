@@ -7,6 +7,7 @@ import VideosPage from './pages/VideosPage'
 import EditorPage from './pages/EditorPage'
 import TemplatesPage from './pages/TemplatesPage'
 import PostsPage from './pages/PostsPage'
+import SettingsPage from './pages/SettingsPage'
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/editor" element={<EditorPage />} />
           <Route path="/templates" element={<TemplatesPage />} />
           <Route path="/posts" element={<PostsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </main>
     </div>
