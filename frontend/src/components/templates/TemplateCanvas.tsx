@@ -144,8 +144,8 @@ export default function TemplateCanvas({
       }
 
       rect.on('modified', syncBox)
-      rect.on('moved', syncBox)
-      rect.on('scaled', syncBox)
+      rect.on('moving', syncBox)
+      rect.on('scaling', syncBox)
 
       return rect
     },
@@ -166,8 +166,8 @@ export default function TemplateCanvas({
     return () => {
       if (rect) {
         rect.off('modified')
-        rect.off('moved')
-        rect.off('scaled')
+        rect.off('moving')
+        rect.off('scaling')
       }
     }
   }, [videoBox, width, height, makeGuideRect, onVideoBoxChange, findObj])

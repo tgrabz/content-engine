@@ -426,7 +426,7 @@ export default function PostsPage() {
             {/* Thumbnail — prefer edited version */}
             <div className="aspect-[9/16] bg-zinc-800 rounded-lg overflow-hidden">
               {(() => {
-                const v = videoForPost(selectedPost)
+                const _v = videoForPost(selectedPost)
                 return (
                   <img
                     src={profileThumbnailUrl(selectedPost.video_id, selectedPost.profile_id)}

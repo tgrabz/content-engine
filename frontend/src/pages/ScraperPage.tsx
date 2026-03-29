@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchNiches, type Niche } from '../api/niches'
-import { fetchCredentials, createCredential, deleteCredential, type Credential } from '../api/credentials'
+import { fetchNiches } from '../api/niches'
+import { fetchCredentials, createCredential, deleteCredential } from '../api/credentials'
 import { startScrape, connectScraperWs, type ScrapeConfig } from '../api/scraper'
 import { Download, Play, Loader2, CheckCircle2, XCircle, Monitor, MonitorOff, Plus, Trash2 } from 'lucide-react'
 

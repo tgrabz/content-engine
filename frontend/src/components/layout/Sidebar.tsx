@@ -42,8 +42,6 @@ export default function Sidebar() {
     activeNetworkId, setActiveNetwork,
     user, networks, logout,
   } = useAppStore()
-  const activeProfile = profiles.find(p => p.id === activeProfileId)
-
   const handleLogout = () => {
     logout()
     navigate('/login')

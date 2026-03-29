@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchVideos, thumbnailUrl, type Video } from '../api/videos'
-import { fetchTemplates, templateImageUrl, type Template } from '../api/templates'
-import { fetchProfiles, updateProfile, type Profile } from '../api/profiles'
+import { fetchVideos, thumbnailUrl } from '../api/videos'
+import { fetchTemplates, templateImageUrl } from '../api/templates'
+import { fetchProfiles, updateProfile } from '../api/profiles'
 import {
   getOrCreateSession, updateSession, autoCrop, captionPlace,
   startRender, renderStatus, renderDownloadUrl, exportToProfile,

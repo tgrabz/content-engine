@@ -5,7 +5,7 @@ import {
   streamUrl, type ProfileVideo,
 } from '../api/videos'
 import { fetchTemplates, templateImageUrl, type Template } from '../api/templates'
-import { fetchProfiles, updateProfile, type Profile } from '../api/profiles'
+import { fetchProfiles, updateProfile } from '../api/profiles'
 import { fetchNiches, type Niche } from '../api/niches'
 import {
   getOrCreateSession, updateSession, startRender, renderStatus,

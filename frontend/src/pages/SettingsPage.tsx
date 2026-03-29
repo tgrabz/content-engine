@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchProfiles, createProfile, deleteProfile, checkUsernames, type Profile, type UsernameCheckResult } from '../api/profiles'
-import { fetchCredentials, createCredential, deleteCredential, type Credential } from '../api/credentials'
+import { fetchProfiles, createProfile, deleteProfile, checkUsernames, type UsernameCheckResult } from '../api/profiles'
+import { fetchCredentials, createCredential, deleteCredential } from '../api/credentials'
 import { fetchNiches } from '../api/niches'
 import {
   getOAuthUrl,

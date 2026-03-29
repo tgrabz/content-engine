@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   fetchTemplates, createTemplate, generateTemplate, updateTemplate, deleteTemplate,
-  templateImageUrl, type Template,
+  templateImageUrl,
 } from '../api/templates'
 import { useAppStore } from '../stores/appStore'
 import TemplateCanvas from '../components/templates/TemplateCanvas'

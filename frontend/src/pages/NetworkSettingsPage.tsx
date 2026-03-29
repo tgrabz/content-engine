@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Trash2, Key, Copy, Users, Globe, Eye, EyeOff } from 'lucide-react'
+import { Plus, Trash2, Key, Copy, Globe, Eye, EyeOff } from 'lucide-react'
 import { fetchNetworks, createNetwork, updateNetwork, deleteNetwork, rotateApiKey, type Network } from '../api/networks'
 import { useAppStore } from '../stores/appStore'
 
