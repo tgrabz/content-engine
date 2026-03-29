@@ -55,31 +55,6 @@ app.include_router(networks.router, prefix="/api/networks", tags=["networks"])
 # Auth router — handles its own auth per-endpoint (register/login are public)
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 
-# Static file serving for downloads/exports/templates
-app.mount("/static/downloads", StaticFiles(directory=str(settings.downloads_dir)), name="downloads")
-app.mount("/static/exports", StaticFiles(directory=str(settings.exports_dir)), name="exports")
-app.mount("/static/templates", StaticFiles(directory=str(settings.templates_dir)), name="templates")
-
-# ── Serve built frontend (production) ───────────────────
-# In Docker, frontend is built to ../static_frontend (sibling to app/)
-# Locally, it's at ../../frontend/dist
-_frontend_dir = BASE_DIR / "static_frontend"
-if not _frontend_dir.exists():
-    _frontend_dir = BASE_DIR.parent / "frontend" / "dist"
-
-if _frontend_dir.exists():
-    app.mount("/assets", StaticFiles(directory=str(_frontend_dir / "assets")), name="frontend-assets")
-
-    @app.get("/{full_path:path}")
-    async def serve_spa(request: Request, full_path: str):
-        """Serve frontend index.html for all non-API routes (SPA fallback)."""
-        # Try to serve a static file first
-        file_path = _frontend_dir / full_path
-        if full_path and file_path.exists() and file_path.is_file():
-            return FileResponse(file_path)
-        return FileResponse(_frontend_dir / "index.html")
-
-
 @app.get("/api/health")
 async def health():
     return {"status": "ok", "version": "0.1.0"}
@@ -129,3 +104,28 @@ def stats(network_id: int | None = None, db: Session = Depends(get_db)):
         "post_counts": post_counts,
         "recent_videos": recent_videos,
     }
+
+
+# Static file serving for downloads/exports/templates
+app.mount("/static/downloads", StaticFiles(directory=str(settings.downloads_dir)), name="downloads")
+app.mount("/static/exports", StaticFiles(directory=str(settings.exports_dir)), name="exports")
+app.mount("/static/templates", StaticFiles(directory=str(settings.templates_dir)), name="templates")
+
+# ── Serve built frontend (production) ───────────────────
+# In Docker, frontend is built to ../static_frontend (sibling to app/)
+# Locally, it's at ../../frontend/dist
+_frontend_dir = BASE_DIR / "static_frontend"
+if not _frontend_dir.exists():
+    _frontend_dir = BASE_DIR.parent / "frontend" / "dist"
+
+if _frontend_dir.exists():
+    app.mount("/assets", StaticFiles(directory=str(_frontend_dir / "assets")), name="frontend-assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(request: Request, full_path: str):
+        """Serve frontend index.html for all non-API routes (SPA fallback)."""
+        # Try to serve a static file first
+        file_path = _frontend_dir / full_path
+        if full_path and file_path.exists() and file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(_frontend_dir / "index.html")
