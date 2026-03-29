@@ -114,11 +114,21 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {!isRegister ? null : (
-          <p className="text-center text-zinc-600 text-xs mt-6">
-            First account becomes the owner
-          </p>
-        )}
+        <p className="text-center text-zinc-500 text-xs mt-6">
+          {isRegister ? (
+            <>Already have an account?{' '}
+              <button onClick={() => setIsRegister(false)} className="text-violet-400 hover:text-violet-300">
+                Sign in
+              </button>
+            </>
+          ) : (
+            <>Need an account?{' '}
+              <button onClick={() => setIsRegister(true)} className="text-violet-400 hover:text-violet-300">
+                Create one
+              </button>
+            </>
+          )}
+        </p>
       </div>
     </div>
   )

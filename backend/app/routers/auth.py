@@ -97,10 +97,13 @@ def register(body: RegisterRequest, db: Session = Depends(get_db)):
     db.add(user)
     db.flush()
 
-    # First user gets assigned to all existing networks
+    # First user gets admin of all networks; subsequent users get member access
     if is_first:
         for network in db.query(Network).all():
             db.add(UserNetwork(user_id=user.id, network_id=network.id, role="admin"))
+    else:
+        for network in db.query(Network).all():
+            db.add(UserNetwork(user_id=user.id, network_id=network.id, role="member"))
 
     db.commit()
     db.refresh(user)
