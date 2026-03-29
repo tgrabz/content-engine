@@ -14,7 +14,8 @@ class IGLoginCredential(Base):
     __tablename__ = "ig_login_credentials"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    network_id: Mapped[int | None] = mapped_column(ForeignKey("networks.id", ondelete="CASCADE"))
+    username: Mapped[str] = mapped_column(String(100), nullable=False)
     password_enc: Mapped[str] = mapped_column(Text, nullable=False)  # Fernet encrypted
     created_at: Mapped[datetime] = mapped_column(default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(default=_utcnow, onupdate=_utcnow)

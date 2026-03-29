@@ -19,6 +19,7 @@ class Video(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    network_id: Mapped[int | None] = mapped_column(ForeignKey("networks.id", ondelete="CASCADE"))
     platform: Mapped[str] = mapped_column(String(20), default="instagram")
     niche_id: Mapped[int] = mapped_column(ForeignKey("niches.id", ondelete="CASCADE"))
     source_account: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -31,6 +32,12 @@ class Video(Base):
     duration_sec: Mapped[float | None] = mapped_column()
     width: Mapped[int | None] = mapped_column()
     height: Mapped[int | None] = mapped_column()
+
+    # AI analysis (cached — shared across all profiles using this video)
+    ai_description: Mapped[str | None] = mapped_column(Text, default=None)
+
+    # Perceptual hash for cross-account duplicate detection
+    video_hash: Mapped[str | None] = mapped_column(String(64), default=None)
 
     # Workflow: downloaded → editing → ready → queued → posting → posted
     status: Mapped[str] = mapped_column(String(20), default="downloaded")

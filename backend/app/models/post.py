@@ -14,6 +14,7 @@ class PostQueue(Base):
     __tablename__ = "post_queue"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    network_id: Mapped[int | None] = mapped_column(ForeignKey("networks.id", ondelete="CASCADE"))
     video_id: Mapped[int] = mapped_column(ForeignKey("videos.id", ondelete="CASCADE"))
     profile_id: Mapped[int] = mapped_column(ForeignKey("profiles.id"))
     caption: Mapped[str] = mapped_column(Text, default="")

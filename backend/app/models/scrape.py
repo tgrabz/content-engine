@@ -14,6 +14,7 @@ class ScrapeJob(Base):
     __tablename__ = "scrape_jobs"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    network_id: Mapped[int | None] = mapped_column(ForeignKey("networks.id", ondelete="CASCADE"))
     niche_id: Mapped[int] = mapped_column(ForeignKey("niches.id"))
     login_credential_id: Mapped[int] = mapped_column(
         ForeignKey("ig_login_credentials.id")

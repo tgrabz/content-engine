@@ -24,3 +24,8 @@ class VideoOut(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class VideoUpdate(BaseModel):
+    status: str | None = None
+    caption: str | None = None

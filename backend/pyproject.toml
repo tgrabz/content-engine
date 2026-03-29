@@ -22,10 +22,22 @@ dependencies = [
     # Scraping
     "selenium>=4.21",
     "webdriver-manager>=4.0",
+    "undetected-chromedriver>=3.5",
+    "setuptools",  # needed by undetected-chromedriver on Python 3.13+
     "yt-dlp>=2024.0",
     # HTTP
     "requests>=2.31",
     "httpx>=0.27",
+    # Auth
+    "pyjwt>=2.8",
+    "bcrypt>=4.0",
+    "pydantic[email]>=2.0",
+    # Database (Postgres support)
+    "psycopg2-binary>=2.9",
+    # AI
+    "anthropic>=0.40",
+    # Video fingerprinting
+    "imagehash>=4.3",
 ]
 
 [project.optional-dependencies]

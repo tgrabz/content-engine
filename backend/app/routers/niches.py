@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -9,15 +9,21 @@ router = APIRouter()
 
 
 @router.get("", response_model=list[NicheOut])
-def list_niches(db: Session = Depends(get_db)):
-    return db.query(Niche).order_by(Niche.name).all()
+def list_niches(network_id: int | None = Query(None), db: Session = Depends(get_db)):
+    q = db.query(Niche)
+    if network_id is not None:
+        q = q.filter(Niche.network_id == network_id)
+    return q.order_by(Niche.name).all()
 
 
 @router.post("", response_model=NicheOut, status_code=201)
-def create_niche(body: NicheCreate, db: Session = Depends(get_db)):
-    if db.query(Niche).filter(Niche.name == body.name).first():
+def create_niche(body: NicheCreate, network_id: int | None = Query(None), db: Session = Depends(get_db)):
+    q = db.query(Niche).filter(Niche.name == body.name)
+    if network_id is not None:
+        q = q.filter(Niche.network_id == network_id)
+    if q.first():
         raise HTTPException(400, f"Niche '{body.name}' already exists")
-    niche = Niche(name=body.name)
+    niche = Niche(name=body.name, network_id=network_id)
     for username in body.accounts:
         niche.accounts.append(NicheAccount(username=username.strip().lstrip("@")))
     db.add(niche)
@@ -42,7 +48,6 @@ def update_niche(niche_id: int, body: NicheUpdate, db: Session = Depends(get_db)
     if body.name is not None:
         niche.name = body.name
     if body.accounts is not None:
-        # Replace all accounts
         db.query(NicheAccount).filter(NicheAccount.niche_id == niche_id).delete()
         for username in body.accounts:
             niche.accounts.append(NicheAccount(username=username.strip().lstrip("@")))
