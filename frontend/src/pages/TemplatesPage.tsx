@@ -7,7 +7,7 @@ import {
 import { useAppStore } from '../stores/appStore'
 import TemplateCanvas from '../components/templates/TemplateCanvas'
 import {
-  Plus, Trash2, Edit3, X, Upload, Save, Loader2, Layers, ArrowLeft, Wand2, BadgeCheck,
+  Trash2, Edit3, X, Upload, Save, Loader2, Layers, ArrowLeft, Wand2, BadgeCheck,
 } from 'lucide-react'
 
 type Box = [number, number, number, number]

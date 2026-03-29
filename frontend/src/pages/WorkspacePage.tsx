@@ -4,18 +4,17 @@ import {
   fetchVideosForProfile, thumbnailUrl, profileThumbnailUrl, profileStreamUrl,
   streamUrl, type ProfileVideo,
 } from '../api/videos'
-import { fetchTemplates, templateImageUrl, type Template } from '../api/templates'
+import { fetchTemplates, templateImageUrl } from '../api/templates'
 import { fetchProfiles, updateProfile } from '../api/profiles'
-import { fetchNiches, type Niche } from '../api/niches'
+import { fetchNiches } from '../api/niches'
 import {
   getOrCreateSession, updateSession, startRender, renderStatus,
   exportToProfile, autoEdit, batchRenderStatus, generateCaption,
-  type AutoEditItem, type BatchStatusItem,
 } from '../api/editor'
-import { createPost, fetchPosts, publishPost, deletePost, type Post } from '../api/posts'
+import { createPost, fetchPosts, publishPost, deletePost } from '../api/posts'
 import { useAppStore } from '../stores/appStore'
 import {
-  Film, Loader2, CheckCircle, Star, Send, Sparkles,
+  Film, Loader2, CheckCircle, Send, Sparkles,
   Zap, Plus, Trash2, AlertCircle, X, Play, Type,
   Clock, Calendar, Shield,
 } from 'lucide-react'
@@ -117,7 +116,7 @@ export default function WorkspacePage() {
 
   // ─── Caption + render for edited videos ───
   const [captionText, setCaptionText] = useState('')
-  const [renderJobId, setRenderJobId] = useState<string | null>(null)
+  const [, setRenderJobId] = useState<string | null>(null)
   const [renderState, setRenderState] = useState<'idle' | 'rendering' | 'complete' | 'failed'>('idle')
   const [renderProgress, setRenderProgress] = useState(0)
   const renderPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -778,7 +777,7 @@ export default function WorkspacePage() {
                         <p className="text-[9px] text-amber-400 flex items-center gap-0.5"><Loader2 size={8} className="animate-spin" /> Processing</p>
                       )}
                     </div>
-                    {post.status === 'failed' && <AlertCircle size={10} className="text-red-400 shrink-0" title={post.error_message || 'Failed'} />}
+                    {post.status === 'failed' && <span title={post.error_message || 'Failed'}><AlertCircle size={10} className="text-red-400 shrink-0" /></span>}
                     {(post.status === 'queued' || post.status === 'scheduled' || post.status === 'failed') && (
                       <button onClick={() => publishMut.mutate(post.id)} disabled={publishMut.isPending}
                         className="p-1 rounded hover:bg-green-600/20 text-green-400 transition-colors disabled:opacity-50 shrink-0"

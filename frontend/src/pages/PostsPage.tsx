@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { fetchPosts, createPost, updatePost, deletePost, publishPost, type Post } from '../api/posts'
-import { fetchVideos, thumbnailUrl, profileThumbnailUrl, profileStreamUrl, type Video } from '../api/videos'
+import { fetchVideos, thumbnailUrl, profileThumbnailUrl, type Video } from '../api/videos'
 import { getOAuthUrl, getProfileToken, deleteProfileToken } from '../api/auth'
 import { generateCaption, describeCaption } from '../api/editor'
 import { useAppStore } from '../stores/appStore'
@@ -426,7 +426,6 @@ export default function PostsPage() {
             {/* Thumbnail — prefer edited version */}
             <div className="aspect-[9/16] bg-zinc-800 rounded-lg overflow-hidden">
               {(() => {
-                const _v = videoForPost(selectedPost)
                 return (
                   <img
                     src={profileThumbnailUrl(selectedPost.video_id, selectedPost.profile_id)}
