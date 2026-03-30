@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   LayoutDashboard,
   FolderOpen,
@@ -35,6 +35,7 @@ const setupLinks = [
 
 export default function Sidebar() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { data: profilesRaw } = useQuery({ queryKey: ['profiles'], queryFn: fetchProfiles })
   const profiles = Array.isArray(profilesRaw) ? profilesRaw : []
   const {
@@ -64,7 +65,10 @@ export default function Sidebar() {
           <div className="relative mt-1">
             <select
               value={activeNetworkId ?? ''}
-              onChange={e => setActiveNetwork(e.target.value ? Number(e.target.value) : null)}
+              onChange={e => {
+                setActiveNetwork(e.target.value ? Number(e.target.value) : null)
+                queryClient.clear()
+              }}
               className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white appearance-none cursor-pointer pr-8"
             >
               {networks.map(n => (
