@@ -65,8 +65,8 @@ async def serve_installer(platform: str):
     """Serve install scripts publicly (repo is private)."""
     from fastapi.responses import PlainTextResponse
     scripts = {
-        "mac": BASE_DIR.parent / "install-mac.sh",
-        "windows": BASE_DIR.parent / "install-windows.ps1",
+        "mac": BASE_DIR / "install-mac.sh",
+        "windows": BASE_DIR / "install-windows.ps1",
     }
     script_path = scripts.get(platform)
     if not script_path or not script_path.exists():

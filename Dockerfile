@@ -30,6 +30,9 @@ COPY backend/ ./
 # Copy built frontend
 COPY --from=frontend-build /app/frontend/dist ./static_frontend
 
+# Copy install scripts
+COPY install-mac.sh install-windows.ps1 ./
+
 # Create data directories
 RUN mkdir -p data downloads exports templates cookies
 
