@@ -478,18 +478,18 @@ def render_video(
     steps: list[str] = []
 
     # Source video: crop → scale → obfuscate → position on canvas
+    # Apply obfuscation BEFORE scaling so micro-crop works on source pixels
     crop_f = f"crop={cw}:{ch}:{cx}:{cy}"
-    scale_f = f"scale={sw}:{sh}"
+    # Ensure even dimensions after scale
+    sw -= sw % 2; sh -= sh % 2
+    exact_f = f"scale={sw}:{sh}"
+    pad_f = f"pad={canvas_w}:{canvas_h}:{ox}:{oy}:0xFFFFFF"
 
-    # If scaled video is taller than box, crop the overflow; otherwise use as-is
     if sh > bh:
-        fill_crop = f"crop={bw}:{bh}:(iw-{bw})/2:0"
-        pad_f = f"pad={canvas_w}:{canvas_h}:{ox}:{oy}:white"
-        steps.append(f"[0:v]{crop_f},{scale_f},{obfusc_vf},{fill_crop},{pad_f},setsar=1[base]")
+        fill_crop = f"crop='min(iw,{bw})':'min(ih,{bh})':(iw-min(iw,{bw}))/2:0"
+        steps.append(f"[0:v]{crop_f},{obfusc_vf},{exact_f},{fill_crop},{pad_f},setsar=1[base]")
     else:
-        # Video is shorter than box — pad within box, position at top
-        pad_f = f"pad={canvas_w}:{canvas_h}:{ox}:{oy}:white"
-        steps.append(f"[0:v]{crop_f},{scale_f},{obfusc_vf},{pad_f},setsar=1[base]")
+        steps.append(f"[0:v]{crop_f},{obfusc_vf},{exact_f},{pad_f},setsar=1[base]")
 
     # Overlay template+caption on top (single overlay at canvas resolution)
     steps.append("[1:v]format=rgba,setsar=1[ovr]")
