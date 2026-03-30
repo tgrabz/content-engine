@@ -477,12 +477,19 @@ def render_video(
     # Build complex filtergraph
     steps: list[str] = []
 
-    # Source video: crop → scale → obfuscate → fill-crop → pad to canvas size
+    # Source video: crop → scale → obfuscate → position on canvas
     crop_f = f"crop={cw}:{ch}:{cx}:{cy}"
     scale_f = f"scale={sw}:{sh}"
-    fill_crop = f"crop={bw}:{bh}:(iw-{bw})/2:(ih-{bh})/2"
-    pad_f = f"pad={canvas_w}:{canvas_h}:{ox}:{oy}:black"
-    steps.append(f"[0:v]{crop_f},{scale_f},{obfusc_vf},{fill_crop},{pad_f},setsar=1[base]")
+
+    # If scaled video is taller than box, crop the overflow; otherwise use as-is
+    if sh > bh:
+        fill_crop = f"crop={bw}:{bh}:(iw-{bw})/2:0"
+        pad_f = f"pad={canvas_w}:{canvas_h}:{ox}:{oy}:black"
+        steps.append(f"[0:v]{crop_f},{scale_f},{obfusc_vf},{fill_crop},{pad_f},setsar=1[base]")
+    else:
+        # Video is shorter than box — pad within box, position at top
+        pad_f = f"pad={canvas_w}:{canvas_h}:{ox}:{oy}:black"
+        steps.append(f"[0:v]{crop_f},{scale_f},{obfusc_vf},{pad_f},setsar=1[base]")
 
     # Overlay template+caption on top (single overlay at canvas resolution)
     steps.append("[1:v]format=rgba,setsar=1[ovr]")
