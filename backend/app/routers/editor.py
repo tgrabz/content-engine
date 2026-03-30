@@ -23,6 +23,16 @@ from app.models.niche import Niche
 from app.services.caption_service import auto_place_caption
 from app.services.caption_ai_service import analyze_video, extract_frames, generate_captions, generate_caption_from_description
 from app.services.crop_service import auto_crop_video
+
+
+def _resolve(path_str: str | None) -> Path | None:
+    """Resolve a possibly-relative path against media_root."""
+    if not path_str:
+        return None
+    p = Path(path_str)
+    if p.is_absolute():
+        return p
+    return settings.media_root / p
 from app.services.render_service import (
     get_render_job,
     start_render_job,
@@ -99,7 +109,7 @@ def get_video_frame(
     if not video or not video.local_path:
         raise HTTPException(404, "Video not found")
 
-    src = Path(video.local_path)
+    src = _resolve(video.local_path)
     if not src.exists():
         raise HTTPException(404, "Video file missing from disk")
 
@@ -191,7 +201,7 @@ def get_preview(
     video = db.get(Video, video_id)
     if not video or not video.local_path:
         raise HTTPException(404, "Video not found")
-    src = Path(video.local_path)
+    src = _resolve(video.local_path)
     if not src.exists():
         raise HTTPException(404, "Video file missing from disk")
 
@@ -290,7 +300,7 @@ def run_auto_crop(body: AutoCropRequest, db: Session = Depends(get_db)):
     video = db.get(Video, body.video_id)
     if not video or not video.local_path:
         raise HTTPException(404, "Video not found")
-    src = Path(video.local_path)
+    src = _resolve(video.local_path)
     if not src.exists():
         raise HTTPException(404, "Video file missing from disk")
 
@@ -345,7 +355,7 @@ def run_caption_place(body: CaptionPlaceRequest, db: Session = Depends(get_db)):
 
     # Load a video frame for color analysis
     video_frame = None
-    src = Path(video.local_path)
+    src = _resolve(video.local_path)
     if src.exists():
         cache_key = f"{body.video_id}_10"
         frame_cached = _FRAME_CACHE / f"{cache_key}.jpg"
@@ -431,7 +441,7 @@ def start_render(body: RenderRequest, db: Session = Depends(get_db)):
     video = db.get(Video, session.video_id)
     if not video or not video.local_path:
         raise HTTPException(404, "Video not found")
-    src = Path(video.local_path)
+    src = _resolve(video.local_path)
     if not src.exists():
         raise HTTPException(404, "Video file missing from disk")
 
@@ -694,7 +704,7 @@ def auto_edit(body: AutoEditRequest, db: Session = Depends(get_db)):
         video = db.get(Video, vid_id)
         if not video or not video.local_path:
             continue
-        src = Path(video.local_path)
+        src = _resolve(video.local_path)
         if not src.exists():
             continue
 
@@ -867,7 +877,7 @@ def generate_caption(body: GenerateCaptionRequest, db: Session = Depends(get_db)
     video = db.get(Video, body.video_id)
     if not video or not video.local_path:
         raise HTTPException(404, "Video not found")
-    src = Path(video.local_path)
+    src = _resolve(video.local_path)
     if not src.exists():
         raise HTTPException(404, "Video file missing from disk")
 

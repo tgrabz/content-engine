@@ -263,10 +263,15 @@ def _publish_post(post_id: int) -> None:
             .filter(EditSession.video_id == post.video_id, EditSession.profile_id == post.profile_id)
             .first()
         )
-        video_path = (
+        video_path_raw = (
             (session.exported_path if session and session.exported_path else None)
             or video.local_path
         )
+        # Resolve relative paths against media_root
+        if video_path_raw and not Path(video_path_raw).is_absolute():
+            video_path = str(settings.media_root / video_path_raw)
+        else:
+            video_path = video_path_raw
         if not video_path or not Path(video_path).exists():
             post.status = "failed"
             post.error_message = "Video file not found on disk"
