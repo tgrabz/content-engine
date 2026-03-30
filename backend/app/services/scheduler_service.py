@@ -56,7 +56,8 @@ def _reencode_for_profile(video_path: str, profile_id: int) -> str:
     Returns path to the re-encoded copy (in exports dir).
     """
     src = Path(video_path)
-    out = src.parent / f"{src.stem}_p{profile_id}_{random.randint(1000,9999)}.mp4"
+    # Always save re-encoded file to exports_dir so it's served via /static/exports/
+    out = settings.exports_dir / f"{src.stem}_p{profile_id}_{random.randint(1000,9999)}.mp4"
 
     crf = random.randint(21, 24)
     audio_br = random.choice([126, 128, 130, 132])
@@ -299,16 +300,26 @@ def _publish_post(post_id: int) -> None:
         if not public_url:
             raise RuntimeError("PUBLIC_URL not configured (set on network or in .env)")
 
+        # Build public URL for Instagram to download the video
+        # Try exports_dir, downloads_dir, or media_root as base paths
         vp = Path(upload_path)
-        if str(settings.exports_dir) in upload_path:
-            rel = vp.relative_to(settings.exports_dir)
-            video_url = f"{public_url}/static/exports/{rel}"
-        elif str(settings.downloads_dir) in upload_path:
-            rel = vp.relative_to(settings.downloads_dir)
-            video_url = f"{public_url}/static/downloads/{rel}"
-        else:
-            raise RuntimeError(f"Video file not in exports or downloads dir: {upload_path}")
+        video_url = None
+        for base_dir, static_prefix in [
+            (settings.exports_dir, "static/exports"),
+            (settings.downloads_dir, "static/downloads"),
+        ]:
+            try:
+                rel = vp.relative_to(base_dir)
+                video_url = f"{public_url}/{static_prefix}/{rel}"
+                break
+            except ValueError:
+                continue
 
+        if not video_url:
+            # Fallback: serve via the video stream API endpoint
+            video_url = f"{public_url}/api/videos/{post.video_id}/stream?edited=true&profile_id={post.profile_id}"
+
+        logger.info(f"Post {post_id}: video_url={video_url}")
         container_id = cli.create_container(
             video_url=video_url,
             caption=post.caption,
@@ -338,7 +349,7 @@ def _publish_post(post_id: int) -> None:
             post = db.get(PostQueue, post_id)
             if post:
                 post.status = "failed"
-                post.error_message = str(e)[:500]
+                post.error_message = (str(e) or repr(e))[:500]
             db.commit()
         except Exception:
             logger.exception("Failed to update post status after error")
