@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     exports_dir: Path = BASE_DIR / "exports"
     templates_dir: Path = BASE_DIR / "templates"
     cookies_dir: Path = BASE_DIR / "cookies"
+    media_root: Path = BASE_DIR  # root for resolving relative video paths
     port: int = 8000
 
     # Instagram Graph API (optional, set in .env)
@@ -37,9 +38,15 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+# If MEDIA_ROOT is set (e.g. Google Drive), redirect downloads/exports/templates there
+if settings.media_root != BASE_DIR:
+    settings.downloads_dir = settings.media_root / "downloads"
+    settings.exports_dir = settings.media_root / "exports"
+    settings.templates_dir = settings.media_root / "templates"
+
 # Ensure directories exist
 for d in [settings.downloads_dir, settings.exports_dir, settings.templates_dir, settings.cookies_dir, BASE_DIR / "data"]:
     d.mkdir(parents=True, exist_ok=True)
 
-THUMB_DIR = settings.downloads_dir.parent / "data" / "thumbnails"
+THUMB_DIR = settings.media_root / "thumbnails"
 THUMB_DIR.mkdir(parents=True, exist_ok=True)

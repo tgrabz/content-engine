@@ -13,6 +13,16 @@ from app.models.profile import Profile
 from app.models.video import Video
 from app.schemas.video import VideoOut, VideoUpdate
 
+
+def _resolve(path_str: str | None) -> Path | None:
+    """Resolve a possibly-relative path against media_root."""
+    if not path_str:
+        return None
+    p = Path(path_str)
+    if p.is_absolute():
+        return p
+    return settings.media_root / p
+
 try:
     import imageio_ffmpeg
 
@@ -175,12 +185,13 @@ def get_thumbnail(
     if not exported and edited and video.exported_path:
         exported = video.exported_path
 
-    if exported and Path(exported).exists():
-        src = Path(exported)
+    resolved_exported = _resolve(exported)
+    if resolved_exported and resolved_exported.exists():
+        src = resolved_exported
         suffix = f"_edited_p{profile_id}" if profile_id else "_edited"
         thumb_path = THUMB_DIR / f"{video_id}{suffix}.jpg"
     else:
-        src = Path(video.local_path)
+        src = _resolve(video.local_path)
         thumb_path = THUMB_DIR / f"{video_id}.jpg"
 
     no_cache_headers = {"Cache-Control": "no-cache, must-revalidate"}
@@ -188,7 +199,7 @@ def get_thumbnail(
     if thumb_path.exists():
         return FileResponse(thumb_path, media_type="image/jpeg", headers=no_cache_headers)
 
-    if not src.exists():
+    if not src or not src.exists():
         raise HTTPException(404, "Video file missing from disk")
 
     try:
@@ -246,12 +257,13 @@ async def stream_video(
     if not exported and edited and video.exported_path:
         exported = video.exported_path
 
-    if exported and Path(exported).exists():
-        path = Path(exported)
+    resolved_exported = _resolve(exported)
+    if resolved_exported and resolved_exported.exists():
+        path = resolved_exported
     else:
-        path = Path(video.local_path)
+        path = _resolve(video.local_path)
 
-    if not path.exists():
+    if not path or not path.exists():
         raise HTTPException(404, "Video file missing from disk")
 
     file_size = path.stat().st_size
@@ -309,10 +321,9 @@ def delete_video(video_id: int, db: Session = Depends(get_db)):
         raise HTTPException(404, "Video not found")
     # Clean up files
     for p in [video.local_path, video.exported_path]:
-        if p:
-            path = Path(p)
-            if path.exists():
-                path.unlink()
+        resolved = _resolve(p)
+        if resolved and resolved.exists():
+            resolved.unlink()
     # Clean up thumbnails (original + edited)
     for suffix in [f"{video.id}.jpg", f"{video.id}_edited.jpg"]:
         thumb = THUMB_DIR / suffix
