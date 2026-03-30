@@ -60,6 +60,20 @@ async def health():
     return {"status": "ok", "version": "0.1.0"}
 
 
+@app.get("/api/install/{platform}")
+async def serve_installer(platform: str):
+    """Serve install scripts publicly (repo is private)."""
+    from fastapi.responses import PlainTextResponse
+    scripts = {
+        "mac": BASE_DIR.parent / "install-mac.sh",
+        "windows": BASE_DIR.parent / "install-windows.ps1",
+    }
+    script_path = scripts.get(platform)
+    if not script_path or not script_path.exists():
+        raise HTTPException(404, "Installer not found")
+    return PlainTextResponse(script_path.read_text())
+
+
 @app.get("/api/stats")
 def stats(network_id: int | None = None, db: Session = Depends(get_db)):
     """Dashboard stats — lightweight counts by status."""

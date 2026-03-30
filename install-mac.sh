@@ -6,7 +6,7 @@ set -e
 
 REPO="https://github.com/tgrabz/content-engine.git"
 INSTALL_DIR="$HOME/content-engine"
-DB_URL="postgresql://postgres:KbmcJjwkiYohSbOujdUiQBAsVOiHPUHU@gondola.proxy.rlwy.net:56830/railway"
+DB_URL="${CONTENT_ENGINE_DB_URL:-postgresql://postgres:KbmcJjwkiYohSbOujdUiQBAsVOiHPUHU@gondola.proxy.rlwy.net:56830/railway}"
 
 echo ""
 echo "  ╔══════════════════════════════════════╗"

@@ -4,8 +4,9 @@ import { Monitor, Apple, Copy, Check, Terminal } from 'lucide-react'
 export default function DownloadPage() {
   const [copied, setCopied] = useState<string | null>(null)
 
-  const macCommand = `curl -fsSL https://raw.githubusercontent.com/tgrabz/content-engine/main/install-mac.sh | bash`
-  const winCommand = `irm https://raw.githubusercontent.com/tgrabz/content-engine/main/install-windows.ps1 | iex`
+  const base = window.location.origin
+  const macCommand = `curl -fsSL ${base}/api/install/mac | bash`
+  const winCommand = `irm ${base}/api/install/windows | iex`
 
   function copy(text: string, id: string) {
     navigator.clipboard.writeText(text)

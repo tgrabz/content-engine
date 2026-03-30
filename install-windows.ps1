@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 
 $REPO = "https://github.com/tgrabz/content-engine.git"
 $INSTALL_DIR = "$env:USERPROFILE\content-engine"
-$DB_URL = "postgresql://postgres:KbmcJjwkiYohSbOujdUiQBAsVOiHPUHU@gondola.proxy.rlwy.net:56830/railway"
+$DB_URL = if ($env:CONTENT_ENGINE_DB_URL) { $env:CONTENT_ENGINE_DB_URL } else { "postgresql://postgres:KbmcJjwkiYohSbOujdUiQBAsVOiHPUHU@gondola.proxy.rlwy.net:56830/railway" }
 
 Write-Host ""
 Write-Host "  ======================================" -ForegroundColor Cyan
