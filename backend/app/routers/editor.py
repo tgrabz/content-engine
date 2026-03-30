@@ -506,17 +506,21 @@ def start_render(body: RenderRequest, db: Session = Depends(get_db)):
                 v.status = "ready"
                 v.exported_path = out_path
 
-            # Auto-create a PostQueue entry so it shows in the queue
+            # Auto-create or update PostQueue entry
             existing_post = (
                 cb_db.query(PostQueue)
                 .filter(
                     PostQueue.video_id == video_id_val,
                     PostQueue.profile_id == profile_id_val,
-                    PostQueue.status.in_(["queued", "scheduled", "uploading", "processing"]),
                 )
+                .order_by(PostQueue.id.desc())
                 .first()
             )
-            if not existing_post:
+            if existing_post and existing_post.status in ("queued", "scheduled"):
+                # Update existing queued post with new caption
+                existing_post.caption = s.post_caption or "" if s else ""
+            elif not existing_post or existing_post.status in ("published", "failed"):
+                # Create fresh post entry
                 max_pos = (
                     cb_db.query(PostQueue.position)
                     .filter(PostQueue.profile_id == profile_id_val)
@@ -531,6 +535,7 @@ def start_render(body: RenderRequest, db: Session = Depends(get_db)):
                     share_to_feed=True,
                     position=pos,
                     status="queued",
+                    network_id=v.network_id if v else None,
                 )
                 cb_db.add(post)
 
