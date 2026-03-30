@@ -98,6 +98,11 @@ npm ci --silent
 title Content Engine
 cd /d "%~dp0"
 
+echo   Checking for updates...
+git pull origin main --ff-only 2>nul && echo   Updated! || echo   Already up to date.
+cd backend && .venv\Scripts\pip install -q -r requirements.txt 2>nul && cd ..
+cd frontend && npm ci --silent 2>nul && cd ..
+
 echo.
 echo   Starting Content Engine...
 echo.

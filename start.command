@@ -2,6 +2,14 @@
 cd "$(dirname "$0")"
 
 echo ""
+echo "  Checking for updates..."
+git pull origin main --ff-only 2>/dev/null && echo "  Updated!" || echo "  Already up to date."
+
+# Auto-install any new deps
+cd backend && .venv/bin/pip install -q -r requirements.txt 2>/dev/null && cd ..
+cd frontend && npm ci --silent 2>/dev/null && cd ..
+
+echo ""
 echo "  Starting Content Engine..."
 echo ""
 
