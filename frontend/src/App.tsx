@@ -12,6 +12,7 @@ import SettingsPage from './pages/SettingsPage'
 import OAuthCallbackPage from './pages/OAuthCallbackPage'
 import NotFoundPage from './pages/NotFoundPage'
 import LoginPage from './pages/LoginPage'
+import DownloadPage from './pages/DownloadPage'
 import NetworkSettingsPage from './pages/NetworkSettingsPage'
 import { useAppStore } from './stores/appStore'
 
@@ -39,6 +40,7 @@ export default function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/download" element={<DownloadPage />} />
         <Route path="/auth/callback" element={<OAuthCallbackPage />} />
 
         {/* Protected app with sidebar */}
