@@ -107,6 +107,8 @@ echo.
 echo   Starting Content Engine...
 echo.
 
+start "Content Engine Updater" /min cmd /c "cd backend && .venv\Scripts\python auto_updater.py"
+
 start "Content Engine Backend" /min cmd /c "cd backend && .venv\Scripts\python -m uvicorn app.main:app --reload --reload-exclude exports/* --reload-exclude downloads/* --reload-exclude templates/* --port 8000"
 
 start "Content Engine Frontend" /min cmd /c "cd frontend && npm run dev"
@@ -122,6 +124,7 @@ echo   Backend:  http://localhost:8000
 echo.
 echo   Close this window to stop.
 pause
+taskkill /fi "windowtitle eq Content Engine Updater" /f > nul 2>&1
 taskkill /fi "windowtitle eq Content Engine Backend" /f > nul 2>&1
 taskkill /fi "windowtitle eq Content Engine Frontend" /f > nul 2>&1
 '@ | Out-File -FilePath "$INSTALL_DIR\Start Content Engine.bat" -Encoding ascii

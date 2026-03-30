@@ -13,8 +13,12 @@ echo ""
 echo "  Starting Content Engine..."
 echo ""
 
-# Start backend
+# Start auto-updater (polls git every 60s, hot-reload picks up changes)
 cd backend
+.venv/bin/python auto_updater.py &
+UPDATER_PID=$!
+
+# Start backend
 .venv/bin/python -m uvicorn app.main:app \
     --reload \
     --reload-exclude "exports/*" \
@@ -43,5 +47,5 @@ echo "  Press Ctrl+C to stop"
 echo ""
 
 # Wait and cleanup on exit
-trap "kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit" INT TERM
+trap "kill $BACKEND_PID $FRONTEND_PID $UPDATER_PID 2>/dev/null; exit" INT TERM
 wait
