@@ -229,9 +229,9 @@ def _render_text_rgba(
         return lines
 
     # Binary search for best font size
-    # Cap at 42px for consistent caption sizing — matches typical IG reel captions.
-    # Short text stays readable at 42px; long text shrinks only if it exceeds box height.
-    MAX_CAPTION_FONT = 42
+    # Cap at 52px for bold caption sizing — matches TeachYouVids style.
+    # Short text stays readable at 52px; long text shrinks only if it exceeds box height.
+    MAX_CAPTION_FONT = 52
     lo, hi = 10, min(MAX_CAPTION_FONT, max(12, int(inner_h * 0.95)))
     best = lo
     best_lines: list[str] = [text]
