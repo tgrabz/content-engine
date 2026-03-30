@@ -484,11 +484,11 @@ def render_video(
     # If scaled video is taller than box, crop the overflow; otherwise use as-is
     if sh > bh:
         fill_crop = f"crop={bw}:{bh}:(iw-{bw})/2:0"
-        pad_f = f"pad={canvas_w}:{canvas_h}:{ox}:{oy}:black"
+        pad_f = f"pad={canvas_w}:{canvas_h}:{ox}:{oy}:white"
         steps.append(f"[0:v]{crop_f},{scale_f},{obfusc_vf},{fill_crop},{pad_f},setsar=1[base]")
     else:
         # Video is shorter than box — pad within box, position at top
-        pad_f = f"pad={canvas_w}:{canvas_h}:{ox}:{oy}:black"
+        pad_f = f"pad={canvas_w}:{canvas_h}:{ox}:{oy}:white"
         steps.append(f"[0:v]{crop_f},{scale_f},{obfusc_vf},{pad_f},setsar=1[base]")
 
     # Overlay template+caption on top (single overlay at canvas resolution)
