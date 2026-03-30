@@ -519,7 +519,14 @@ def start_render(body: RenderRequest, db: Session = Depends(get_db)):
             if existing_post and existing_post.status in ("queued", "scheduled"):
                 # Update existing queued post with new caption
                 existing_post.caption = s.post_caption or "" if s else ""
-            elif not existing_post or existing_post.status in ("published", "failed"):
+            elif existing_post and existing_post.status == "failed":
+                # Reset failed post back to queued with fresh state
+                existing_post.status = "queued"
+                existing_post.error_message = None
+                existing_post.caption = s.post_caption or "" if s else ""
+                existing_post.ig_container_id = None
+                existing_post.ig_media_id = None
+            elif not existing_post or existing_post.status == "published":
                 # Create fresh post entry
                 max_pos = (
                     cb_db.query(PostQueue.position)
