@@ -20,10 +20,12 @@ interface AppState {
   token: string | null
   user: AuthUser | null
   networks: NetworkBrief[]
+  localMediaUrl: string | null  // e.g. "http://localhost:8100" — serves files locally
   setActiveProfile: (id: number | null) => void
   setActiveNetwork: (id: number | null) => void
   setAuth: (token: string, user: AuthUser, networks: NetworkBrief[]) => void
   setNetworks: (networks: NetworkBrief[]) => void
+  setLocalMediaUrl: (url: string | null) => void
   logout: () => void
 }
 
@@ -35,8 +37,10 @@ export const useAppStore = create<AppState>()(
       token: null,
       user: null,
       networks: [],
+      localMediaUrl: null,
       setActiveProfile: (id) => set({ activeProfileId: id }),
       setActiveNetwork: (id) => set({ activeNetworkId: id, activeProfileId: null }),
+      setLocalMediaUrl: (url) => set({ localMediaUrl: url }),
       setAuth: (token, user, networks) => set({
         token,
         user,

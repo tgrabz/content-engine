@@ -11,7 +11,73 @@ import {
   deleteProfileToken,
   type OAuthToken,
 } from '../api/auth'
-import { Plus, Trash2, User, KeyRound, Instagram, Unlink, Loader2, Check, Search, CheckCircle, XCircle } from 'lucide-react'
+import { Plus, Trash2, User, KeyRound, Instagram, Unlink, Loader2, Check, Search, CheckCircle, XCircle, HardDrive } from 'lucide-react'
+import { useAppStore } from '../stores/appStore'
+
+function LocalMediaSection() {
+  const { localMediaUrl, setLocalMediaUrl } = useAppStore()
+  const [url, setUrl] = useState(localMediaUrl || '')
+  const [status, setStatus] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle')
+
+  async function testConnection() {
+    if (!url.trim()) { setLocalMediaUrl(null); setStatus('idle'); return }
+    setStatus('testing')
+    try {
+      const res = await fetch(`${url.trim()}/api/health`)
+      if (res.ok) {
+        setLocalMediaUrl(url.trim().replace(/\/$/, ''))
+        setStatus('ok')
+      } else {
+        setStatus('fail')
+      }
+    } catch {
+      setStatus('fail')
+    }
+  }
+
+  function disconnect() {
+    setLocalMediaUrl(null)
+    setUrl('')
+    setStatus('idle')
+  }
+
+  return (
+    <section>
+      <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+        <HardDrive size={14} /> Local Media Server
+      </h3>
+      <p className="text-xs text-zinc-600 mb-3">
+        Run the local media server on your machine to view thumbnails and stream videos from your local files.
+        Start it with: <code className="text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">python media_server.py</code>
+      </p>
+      <div className="flex gap-2 items-end">
+        <div className="flex-1">
+          <label className="text-xs text-zinc-500">Server URL</label>
+          <input
+            value={url}
+            onChange={e => { setUrl(e.target.value); setStatus('idle') }}
+            placeholder="http://localhost:8100"
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-white text-sm mt-1 font-mono"
+          />
+        </div>
+        <button
+          onClick={testConnection}
+          disabled={status === 'testing'}
+          className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white rounded-lg text-sm"
+        >
+          {status === 'testing' ? <Loader2 size={16} className="animate-spin" /> : 'Connect'}
+        </button>
+        {localMediaUrl && (
+          <button onClick={disconnect} className="px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg text-sm">
+            Disconnect
+          </button>
+        )}
+      </div>
+      {status === 'ok' && <p className="text-xs text-green-400 mt-2 flex items-center gap-1"><CheckCircle size={12} /> Connected to local media server</p>}
+      {status === 'fail' && <p className="text-xs text-red-400 mt-2 flex items-center gap-1"><XCircle size={12} /> Could not connect. Make sure the local server is running.</p>}
+    </section>
+  )
+}
 
 export default function SettingsPage() {
   const qc = useQueryClient()
@@ -328,6 +394,9 @@ export default function SettingsPage() {
           </div>
         )}
       </section>
+
+      {/* Local Media Server */}
+      <LocalMediaSection />
 
       {/* Credentials */}
       <section>

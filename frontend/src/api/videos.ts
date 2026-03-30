@@ -1,4 +1,10 @@
 import api from './client'
+import { useAppStore } from '../stores/appStore'
+
+/** Build media URL — uses local server if configured, otherwise remote API */
+const mediaBase = () => useAppStore.getState().localMediaUrl
+  ? `${useAppStore.getState().localMediaUrl}/api`
+  : '/api'
 
 export interface Video {
   id: number
@@ -67,11 +73,11 @@ export interface ProfileVideo extends Video {
 export const fetchVideosForProfile = (profileId: number) =>
   api.get<ProfileVideo[]>(`/videos/for-profile/${profileId}`).then(r => r.data)
 
-export const thumbnailUrl = (videoId: number) => `/api/videos/${videoId}/thumbnail`
-export const editedThumbnailUrl = (videoId: number) => `/api/videos/${videoId}/thumbnail?edited=true`
+export const thumbnailUrl = (videoId: number) => `${mediaBase()}/videos/${videoId}/thumbnail`
+export const editedThumbnailUrl = (videoId: number) => `${mediaBase()}/videos/${videoId}/thumbnail?edited=true`
 export const profileThumbnailUrl = (videoId: number, profileId: number) =>
-  `/api/videos/${videoId}/thumbnail?edited=true&profile_id=${profileId}`
-export const streamUrl = (videoId: number) => `/api/videos/${videoId}/stream`
-export const editedStreamUrl = (videoId: number) => `/api/videos/${videoId}/stream?edited=true`
+  `${mediaBase()}/videos/${videoId}/thumbnail?edited=true&profile_id=${profileId}`
+export const streamUrl = (videoId: number) => `${mediaBase()}/videos/${videoId}/stream`
+export const editedStreamUrl = (videoId: number) => `${mediaBase()}/videos/${videoId}/stream?edited=true`
 export const profileStreamUrl = (videoId: number, profileId: number) =>
-  `/api/videos/${videoId}/stream?edited=true&profile_id=${profileId}`
+  `${mediaBase()}/videos/${videoId}/stream?edited=true&profile_id=${profileId}`
