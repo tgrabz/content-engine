@@ -403,10 +403,8 @@ def render_video(
     bw -= bw % 2
     bh -= bh % 2
 
-    # Scale cropped video to FILL the video box (cover, not contain)
-    scale = max(bw / float(max(1, cw)), bh / float(max(1, ch)))
-    # Over-scale slightly to compensate for obfuscation micro-crop (max 3px/edge)
-    scale *= 1.02
+    # WIDTH-FILL scaling: match box width, crop height if overflow
+    scale = bw / float(max(1, cw))
     sw = max(2, int(round(cw * scale)))
     sw -= sw % 2
     sh = max(2, int(round(ch * scale)))

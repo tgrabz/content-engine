@@ -210,7 +210,7 @@ def get_preview(
     vbox = _parse_box_with_default(video_box, (0.06, 0.18, 0.94, 0.94))
     cbox = _parse_box_with_default(caption_box, (0.06, 0.08, 0.94, 0.16))
 
-    # ── 1. Template base (same as render_service.render_video) ──
+    # ── 1. Template base ──
     comp = Image.new("RGB", (W, H), (255, 255, 255))
     if template_id:
         tmpl = db.get(Template, template_id)
@@ -222,7 +222,7 @@ def get_preview(
             comp_rgba.alpha_composite(tmpl_img)
             comp = comp_rgba.convert("RGB")
 
-    # ── 2. Video frame: crop + fit-scale (same math as render_service) ──
+    # ── 2. Video frame: crop + scale into video_box ──
     frame = _extract_frame(str(src), video_id, t)
     if frame:
         vid_w, vid_h = frame.size
@@ -246,21 +246,19 @@ def get_preview(
         bw = int((vx2 - vx1) * W)
         bh = int((vy2 - vy1) * H)
 
-        # FILL scaling: scale to cover the entire box, then center-crop overflow
-        scale = max(bw / float(max(1, cw)), bh / float(max(1, ch)))
+        # WIDTH-FILL scaling: match box width, crop height if overflow
+        scale = bw / float(max(1, cw))
         sw = max(2, int(round(cw * scale)))
         sh = max(2, int(round(ch * scale)))
         scaled_vid = cropped.resize((sw, sh), Image.LANCZOS)
 
-        # Center-crop to exact box dimensions
-        cx_off = max(0, (sw - bw) // 2)
-        cy_off = max(0, (sh - bh) // 2)
-        scaled_vid = scaled_vid.crop((cx_off, cy_off, cx_off + bw, cy_off + bh))
+        # If taller than box, crop from bottom
+        if sh > bh:
+            scaled_vid = scaled_vid.crop((0, 0, sw, bh))
+            sh = bh
 
         ox = bx
         oy = by
-        ox = max(0, min(ox, W - bw))
-        oy = max(0, min(oy, H - bh))
 
         comp.paste(scaled_vid, (ox, oy))
 
