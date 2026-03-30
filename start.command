@@ -18,6 +18,13 @@ cd backend
 .venv/bin/python auto_updater.py &
 UPDATER_PID=$!
 
+# Start tunnel for Instagram posting (auto-updates DB with public URL)
+if command -v ngrok &>/dev/null; then
+    .venv/bin/python tunnel.py &
+    TUNNEL_PID=$!
+    echo "  Tunnel starting..."
+fi
+
 # Start backend
 .venv/bin/python -m uvicorn app.main:app \
     --reload \
@@ -47,5 +54,5 @@ echo "  Press Ctrl+C to stop"
 echo ""
 
 # Wait and cleanup on exit
-trap "kill $BACKEND_PID $FRONTEND_PID $UPDATER_PID 2>/dev/null; exit" INT TERM
+trap "kill $BACKEND_PID $FRONTEND_PID $UPDATER_PID $TUNNEL_PID 2>/dev/null; pkill ngrok 2>/dev/null; exit" INT TERM
 wait
