@@ -214,8 +214,9 @@ def get_preview(
     comp = Image.new("RGB", (W, H), (255, 255, 255))
     if template_id:
         tmpl = db.get(Template, template_id)
-        if tmpl and Path(tmpl.image_path).exists():
-            tmpl_img = Image.open(tmpl.image_path).convert("RGBA")
+        tmpl_path = _resolve(tmpl.image_path) if tmpl else None
+        if tmpl_path and tmpl_path.exists():
+            tmpl_img = Image.open(str(tmpl_path)).convert("RGBA")
             tmpl_img = tmpl_img.resize((W, H), Image.LANCZOS)
             comp_rgba = comp.convert("RGBA")
             comp_rgba.alpha_composite(tmpl_img)
@@ -341,8 +342,9 @@ def run_caption_place(body: CaptionPlaceRequest, db: Session = Depends(get_db)):
     if body.template_id:
         tmpl = db.get(Template, body.template_id)
         if tmpl:
-            if Path(tmpl.image_path).exists():
-                template_img = Image.open(tmpl.image_path).convert("RGBA")
+            _tmpl_path = _resolve(tmpl.image_path)
+            if _tmpl_path and _tmpl_path.exists():
+                template_img = Image.open(str(_tmpl_path)).convert("RGBA")
             # Pass template's designed caption_box as a preferred candidate
             if tmpl.caption_box:
                 try:
@@ -452,10 +454,11 @@ def start_render(body: RenderRequest, db: Session = Depends(get_db)):
     if session.template_id:
         tmpl = db.get(Template, session.template_id)
         if tmpl:
-            template_image_path = tmpl.image_path
+            template_image_path = str(_resolve(tmpl.image_path))
             video_box = _parse_box(tmpl.video_box)
-            if Path(tmpl.image_path).exists():
-                template_img = Image.open(tmpl.image_path).convert("RGBA")
+            _tmpl_path = _resolve(tmpl.image_path)
+            if _tmpl_path and _tmpl_path.exists():
+                template_img = Image.open(str(_tmpl_path)).convert("RGBA")
 
     # Use session caption_box if set (by Smart Placement), otherwise auto-compute
     caption_box = None
@@ -650,7 +653,7 @@ def auto_edit(body: AutoEditRequest, db: Session = Depends(get_db)):
         raise HTTPException(400, "Default template not found.")
 
     video_box = _parse_box(tmpl.video_box)
-    template_image_path = tmpl.image_path
+    template_image_path = str(_resolve(tmpl.image_path))
 
     # Load template image for caption placement
     template_img = None
